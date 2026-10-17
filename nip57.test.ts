@@ -101,6 +101,19 @@ describe('validateZapRequest', () => {
     expect(validateZapRequest(JSON.stringify(zapRequest))).toBe("Zap request 'e' tag is not valid hex.")
   })
 
+  test('returns an error message if the Zap request has more than one "p" or "e" tag', () => {
+    const privateKey = generateSecretKey()
+    const p = ['p', getPublicKey(privateKey)]
+    const e = ['e', 'efeb5d6e74ce6ffea6cae4094a9f29c26b5c56d7b44fae9f490f3410fd708c45']
+    const request = (tags: string[][]) =>
+      JSON.stringify(
+        finalizeEvent({ kind: 9734, created_at: 0, content: '', tags: [...tags, ['relays', 'r']] }, privateKey),
+      )
+
+    expect(validateZapRequest(request([p, p]))).toBe("Zap request has more than one 'p' tag.")
+    expect(validateZapRequest(request([p, e, e]))).toBe("Zap request has more than one 'e' tag.")
+  })
+
   test('returns an error message if the Zap request does not have a relays tag', () => {
     const privateKey = generateSecretKey()
     const publicKey = getPublicKey(privateKey)

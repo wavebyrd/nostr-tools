@@ -101,9 +101,11 @@ export function validateZapRequest(zapRequestString: string): string | null {
   let p = zapRequest.tags.find(([t, v]) => t === 'p' && v)
   if (!p) return "Zap request doesn't have a 'p' tag."
   if (!isHex32(p[1])) return "Zap request 'p' tag is not valid hex."
+  if (zapRequest.tags.filter(([t]) => t === 'p').length > 1) return "Zap request has more than one 'p' tag."
 
   let e = zapRequest.tags.find(([t, v]) => t === 'e' && v)
   if (e && !isHex32(e[1])) return "Zap request 'e' tag is not valid hex."
+  if (zapRequest.tags.filter(([t]) => t === 'e').length > 1) return "Zap request has more than one 'e' tag."
 
   let relays = zapRequest.tags.find(([t, v]) => t === 'relays' && v)
   if (!relays) return "Zap request doesn't have a 'relays' tag."
